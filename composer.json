@@ -1,0 +1,16 @@
+{
+    "name": "matteo/rabbimq-test",
+    "require": {
+        "videlalvaro/php-amqplib": "~2.2.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7.28"
+    },
+    "authors": [
+        {
+            "name": "Matteo",
+            "email": "matteog@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
