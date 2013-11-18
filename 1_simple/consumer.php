@@ -17,19 +17,21 @@ $port = 5672;
 $conn = new AMQPConnection($host, $port, 'guest', 'guest');
 $channel = $conn->channel();
 
-//$queue = $channel->queue_declare('simple', false, false);
-$channel->exchange_declare('simple', 'fanout', false, false, false);
-list($queue_name,,) = $channel->queue_declare("", false, false, true, false);
+$channel->exchange_delete('simple');
+$channel->exchange_declare('simple', 'fanout', false, false, true);
+$channel->queue_declare('simple_queue', false, true, false, false);
 
-$channel->queue_bind($queue_name, 'simple');
+$channel->queue_bind('simple_queue', 'simple');
 
 echo ' [*] Waiting for logs. To exit press CTRL+C', "\n";
 
-$callback = function($msg){
-  echo ' [x] ', $msg->body, "\n";
+$callback = function(\PhpAmqpLib\Message\AMQPMessage $msg) {
+    echo ' [x] ', $msg->body, "\n";
+    usleep(200000);
+    $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
 };
 
-$channel->basic_consume($queue_name, '', false, true, false, false, $callback);
+$channel->basic_consume('simple_queue', '', false, false, false, false, $callback);
 
 while(count($channel->callbacks)) {
     $channel->wait();
